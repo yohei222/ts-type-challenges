@@ -33,8 +33,12 @@
 */
 
 /* _____________ ここにコードを記入 _____________ */
-// todo ここから
-type MyReadonly2<T, K> = any
+// https://github.com/type-challenges/type-challenges/issues/9050
+type MyReadonly2<T, K extends keyof T> = {
+  [p in keyof T as p extends K ? never : p]: T[p]
+} & {
+  readonly [p in K]: T[p]
+}
 
 interface Todo {
   title: string
@@ -42,15 +46,15 @@ interface Todo {
   completed: boolean
 }
 
-const todo: MyReadonly2<Todo, 'title' | 'description'> = {
+const todo2: MyReadonly2<Todo, 'title' | 'description'> = {
   title: "Hey",
   description: "foobar",
   completed: false,
 }
 
-todo.title = "Hello" // Error: cannot reassign a readonly property
-todo.description = "barFoo" // Error: cannot reassign a readonly property
-todo.completed = true // OK
+todo2.title = "Hello" // Error: cannot reassign a readonly property
+todo2.description = "barFoo" // Error: cannot reassign a readonly property
+todo2.completed = true // OK
 
 /* _____________ テストケース _____________ */
 // import type { Alike, Expect } from '@type-challenges/utils'
